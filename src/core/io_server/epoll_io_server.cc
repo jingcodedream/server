@@ -33,11 +33,11 @@ IOOption IOServerEpoll::AddEvent(IOOption op, uint32_t fd, std::shared_ptr<Sessi
     struct epoll_event event;
     if(op & IOOptionRead)
     {
-        event.events |= (EPOLLIN | EPOLLET);
+        event.events |= EPOLLIN ;
     }
     if(op & IOOptionWrite)
     {
-        event.events |= (EPOLLOUT| EPOLLET);
+        event.events |= EPOLLOUT;
     }
     event.data.fd = fd;
     event.data.ptr = (void*)(session.get());
