@@ -24,7 +24,7 @@ int32_t ListenSession::Init(){
         return -2;
     }
     fd_ = fd;
-    std::tr1::shared_ptr<ListenSession> sp_this(this);
+    std::shared_ptr<ListenSession> sp_this(this);
     io_server_interface_->AddEvent(IOOptionRead, fd_, sp_this);
     return 0;
 }
@@ -37,7 +37,7 @@ IOStatus ListenSession::OnRead() {
     {
         return IOStatusError;
     }
-    std::tr1::shared_ptr<ConnectSession> accept_session(new ConnectSession(accept_fd, peer_addr.sin_addr.s_addr, peer_addr.sin_port));
+    std::shared_ptr<ConnectSession> accept_session(new ConnectSession(accept_fd, inet_ntoa(peer_addr.sin_addr), peer_addr.sin_port));
     io_server_interface_->AddEvent(IOOptionRead, accept_fd, accept_session);
     return IOStatusContinue;
 }

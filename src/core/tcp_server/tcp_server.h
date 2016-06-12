@@ -1,5 +1,5 @@
 /*
- * CoreServer.h
+ * tcp_server.h
  *
  *  Created on: 2016年5月13日
  *      Author: joe

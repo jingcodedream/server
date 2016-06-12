@@ -8,6 +8,8 @@
 #ifndef SRC_CORE_SESSION_INTERFACE_H_
 #define SRC_CORE_SESSION_INTERFACE_H_
 
+#include <stdint.h>
+
 enum IOStatus {    //当前session的IO状态
     IOStatusSuccess,
     IOStatusContinue,

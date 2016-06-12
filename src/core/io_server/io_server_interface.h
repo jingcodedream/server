@@ -35,7 +35,7 @@ public:
     virtual bool RunOnce() = 0;
     virtual void RunForever() = 0;
 
-    virtual IOOption AddEvent(IOOption op, uint32_t fd, std::tr1::shared_ptr<SessionInterface> session) = 0;
+    virtual IOOption AddEvent(IOOption op, uint32_t fd, std::shared_ptr<SessionInterface> session) = 0;
     virtual IOOption DelEvent(uint32_t events, uint32_t fd) = 0;
     virtual IOOption WaitEvent() = 0;
 };

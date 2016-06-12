@@ -6,21 +6,22 @@
  */
 
 #include "io_server/epoll_io_server.h"
+#include "session/session_interface.h"
 
 #include <sys/epoll.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
 
 static const uint32_t sc_maxevents=1024;
 static const uint32_t sc_timeout=3000;
 
-IOServerEpoll::IOServerEpoll():IOServerEpoll(0, sc_maxevents, sc_timeout) { //委托构造函数，c++11支持
-}
+IOServerEpoll::IOServerEpoll():IOServerEpoll(0, sc_maxevents, sc_timeout) {} //委托构造函数，c++11支持
 
-IOServerEpoll::IOServerEpoll(uint32_t flags, uint32_t maxevents, uint32_t timeout) {
+
+IOServerEpoll::IOServerEpoll(uint32_t flags, uint32_t maxevents, uint32_t timeout) : maxevents(maxevents), timeout(timeout) {
     epfd = epoll_create1(flags);    //建议使用epoll_create1代替epoll_create,最新的实现中epoll已忽略size
     events = (epoll_event*)malloc(sizeof(struct epoll_event) * maxevents);
-    this->maxevents = maxevents;
-    this->timeout = timeout;
-    sleep(30);
 }
 
 IOServerEpoll::~IOServerEpoll() {
@@ -28,7 +29,7 @@ IOServerEpoll::~IOServerEpoll() {
     free(events);
 }
 
-IOOption IOServerEpoll::AddEvent(IOOption op, uint32_t fd, std::tr1::shared_ptr<SessionInterface> session) {
+IOOption IOServerEpoll::AddEvent(IOOption op, uint32_t fd, std::shared_ptr<SessionInterface> session) {
     struct epoll_event event;
     if(op & IOOptionRead)
     {
@@ -36,11 +37,26 @@ IOOption IOServerEpoll::AddEvent(IOOption op, uint32_t fd, std::tr1::shared_ptr<
     }
     if(op & IOOptionWrite)
     {
-        event.events |= EPOLLOUT;
+        event.events |= (EPOLLOUT| EPOLLET);
     }
     event.data.fd = fd;
     event.data.ptr = (void*)(session.get());
-    return epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &event);
+    int32_t ret = epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &event);
+    if(ret != 0)
+    {
+        if(errno == EEXIST)
+        {
+            ret = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &event);
+            if(ret != 0)
+            {
+                return IOOptionEmpty;
+            }
+        }else
+        {
+            return IOOptionEmpty;
+        }
+    }
+    return event.events;
 }
 
 IOOption IOServerEpoll::DelEvent(IOOption op, uint32_t fd) {
@@ -80,7 +96,7 @@ bool IOServerEpoll::RunOnce() {
     for(uint32_t i = 0; i < ret; ++i)
     {
         int fd = events[i].data.fd;
-        std::tr1::shared_ptr<SessionInterface> session(events[i].data.ptr);
+        std::shared_ptr<SessionInterface> session(static_cast<SessionInterface *>(events[i].data.ptr));
         uint32_t del_events = 0;
         if((events[i].events & EPOLLIN) == 1)
         {
