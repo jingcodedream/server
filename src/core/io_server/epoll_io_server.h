@@ -10,11 +10,11 @@
 
 #include "io_server/io_server_interface.h"
 
-class IOServerEpoll : public IOServerInterface {
+class EpollIOServer : public IOServerInterface {
 public:
-    IOServerEpoll();
-    IOServerEpoll(uint32_t flags, uint32_t maxevents, uint32_t timeout);
-    ~IOServerEpoll();
+    EpollIOServer();
+    EpollIOServer(uint32_t flags, uint32_t maxevents, uint32_t timeout);
+    ~EpollIOServer();
 
     bool RunOnce();
     void RunForever();

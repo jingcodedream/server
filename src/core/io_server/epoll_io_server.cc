@@ -16,20 +16,20 @@
 static const uint32_t sc_maxevents=1024;
 static const uint32_t sc_timeout=3000;
 
-IOServerEpoll::IOServerEpoll():IOServerEpoll(0, sc_maxevents, sc_timeout) {} //委托构造函数，c++11支持
+EpollIOServer::EpollIOServer():EpollIOServer(0, sc_maxevents, sc_timeout) {} //委托构造函数，c++11支持
 
 
-IOServerEpoll::IOServerEpoll(uint32_t flags, uint32_t maxevents, uint32_t timeout) : maxevents(maxevents), timeout(timeout) {
+EpollIOServer::EpollIOServer(uint32_t flags, uint32_t maxevents, uint32_t timeout) : maxevents(maxevents), timeout(timeout) {
     epfd = epoll_create1(flags);    //建议使用epoll_create1代替epoll_create,最新的实现中epoll已忽略size
     events = (epoll_event*)malloc(sizeof(struct epoll_event) * maxevents);
 }
 
-IOServerEpoll::~IOServerEpoll() {
+EpollIOServer::~EpollIOServer() {
     close(epfd);
     free(events);
 }
 
-IOOption IOServerEpoll::AddEvent(IOOption op, uint32_t fd, std::shared_ptr<SessionInterface> session) {
+IOOption EpollIOServer::AddEvent(IOOption op, uint32_t fd, std::shared_ptr<SessionInterface> session) {
     struct epoll_event event;
     if(op & IOOptionRead)
     {
@@ -59,7 +59,7 @@ IOOption IOServerEpoll::AddEvent(IOOption op, uint32_t fd, std::shared_ptr<Sessi
     return event.events;
 }
 
-IOOption IOServerEpoll::DelEvent(IOOption op, uint32_t fd) {
+IOOption EpollIOServer::DelEvent(IOOption op, uint32_t fd) {
     struct epoll_event event;
     if(op & IOOptionRead)
     {
@@ -73,11 +73,11 @@ IOOption IOServerEpoll::DelEvent(IOOption op, uint32_t fd) {
     return epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &event);
 }
 
-IOOption IOServerEpoll::WaitEvent() {
+IOOption EpollIOServer::WaitEvent() {
     return epoll_wait(epfd, events, maxevents, timeout);
 }
 
-void IOServerEpoll::RunForever() {
+void EpollIOServer::RunForever() {
     while(true)
     {
         if(!RunOnce())
@@ -87,7 +87,7 @@ void IOServerEpoll::RunForever() {
     }
 }
 
-bool IOServerEpoll::RunOnce() {
+bool EpollIOServer::RunOnce() {
     int ret = WaitEvent();
     if(ret < 0)
     {

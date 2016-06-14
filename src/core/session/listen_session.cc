@@ -24,7 +24,7 @@ int32_t ListenSession::Init(){
         return -2;
     }
     fd_ = fd;
-    std::shared_ptr<ListenSession> sp_this(this);
+    std::shared_ptr<SessionInterface> sp_this(this);
     io_server_interface_->AddEvent(IOOptionRead, fd_, sp_this);
     return 0;
 }
