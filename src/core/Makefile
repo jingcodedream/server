@@ -18,7 +18,7 @@ LIBNAME=server.a
 #动态库文件名
 SONAME=server.so
 
-all:${OBJS} #lib
+all:${OBJS} lib
 
 #生成所有.o文件
 ${OBJDIR}/%.o:*/%.cc
