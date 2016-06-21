@@ -19,6 +19,7 @@ public:
 
     int32_t Init();
     IOStatus OnRead();
+    int32_t GetFd() {return fd_;}
     IOStatus OnWrite() {return IOStatusError;}
     IOStatus OnError() {return IOStatusError;}
 private:

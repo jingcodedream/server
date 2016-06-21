@@ -13,11 +13,12 @@ TCPServer::TCPServer() : io_server_(new EpollIOServer()) {
 }
 
 int32_t TCPServer::OnListen() {
-    std::shared_ptr<SessionInterface> listen_session1(new ListenSession("127.0.0.1", 8888, io_server_));
-    if(listen_session1->Init() != 0)
+    std::shared_ptr<SessionInterface> listen_session(new ListenSession("127.0.0.1", 8888, io_server_));
+    if(listen_session->Init() != 0)
     {
         return -1;
     }
+    io_server_->AddEvent(IOOptionRead, listen_session->GetFd(), listen_session);
     return 0;
 }
 

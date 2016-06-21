@@ -12,20 +12,17 @@
 #include "connect_session.h"
 
 int32_t ListenSession::Init(){
-    int32_t fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-    if(fd < 0) {
+    fd_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+    if(fd_ < 0) {
         return -1;
     }
     struct sockaddr_in listen_addr;
     listen_addr.sin_family = AF_INET;
     listen_addr.sin_port = htonl(listen_port_);
     listen_addr.sin_addr.s_addr = inet_addr(listen_ipv4_.c_str());
-    if(bind(fd, (sockaddr *)&listen_addr, sizeof(sockaddr)) != 0){
+    if(bind(fd_, (sockaddr *)&listen_addr, sizeof(sockaddr)) != 0){
         return -2;
     }
-    fd_ = fd;
-    std::shared_ptr<SessionInterface> sp_this(this);
-    io_server_interface_->AddEvent(IOOptionRead, fd_, sp_this);
     return 0;
 }
 
@@ -38,7 +35,7 @@ IOStatus ListenSession::OnRead() {
         return IOStatusError;
     }
     std::shared_ptr<ConnectSession> accept_session(new ConnectSession(accept_fd, inet_ntoa(peer_addr.sin_addr), peer_addr.sin_port));
-    io_server_interface_->AddEvent(IOOptionRead, accept_fd, accept_session);
+    io_server_->AddEvent(IOOptionRead, accept_fd, accept_session);
     return IOStatusContinue;
 }
 

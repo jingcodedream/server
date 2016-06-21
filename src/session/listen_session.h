@@ -15,19 +15,20 @@
 
 class ListenSession : public SessionInterface {
 public:
-    ListenSession(const std::string &listen_ipv4, uint32_t listen_port, std::shared_ptr<IOServerInterface> io_server_interface)
-        : fd_(-1), listen_ipv4_(listen_ipv4), listen_port_(listen_port), io_server_interface_(io_server_interface) {}
+    ListenSession(const std::string &listen_ipv4, uint32_t listen_port, std::shared_ptr<IOServerInterface> io_server_)
+        : fd_(-1), listen_ipv4_(listen_ipv4), listen_port_(listen_port), io_server_(io_server_) {}
     ~ListenSession(){}
 
     int32_t Init();
     IOStatus OnRead();
+    int32_t GetFd() {return fd_;}
     IOStatus OnWrite() {return IOStatusError;}
     IOStatus OnError() {return IOStatusError;}
 private:
     int32_t fd_;
     std::string listen_ipv4_;
     uint32_t listen_port_;
-    std::shared_ptr<IOServerInterface> io_server_interface_;
+    std::shared_ptr<IOServerInterface> io_server_;
 };
 
 #endif /* SRC_CORE_SESSION_LISTEN_SESSION_H_ */
