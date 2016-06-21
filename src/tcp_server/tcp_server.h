@@ -14,8 +14,7 @@
 
 #include <memory>
 
-class TCPServer
-{
+class TCPServer {
 public:
     TCPServer();
     ~TCPServer(){};
@@ -24,7 +23,6 @@ public:
 private:
     int32_t OnListen();
     void OnConnect();
-private:
     std::shared_ptr<IOServerInterface> io_server_;
 };
 

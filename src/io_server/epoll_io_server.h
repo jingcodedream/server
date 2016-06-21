@@ -11,19 +11,16 @@
 #include "io_server/io_server_interface.h"
 
 class EpollIOServer : public IOServerInterface {
-public:
+  public:
     EpollIOServer();
     EpollIOServer(uint32_t flags, uint32_t maxevents, uint32_t timeout);
     ~EpollIOServer();
-
     bool RunOnce();
     void RunForever();
-
-    IOOption AddEvent(IOOption op, uint32_t fd, std::shared_ptr<SessionInterface> session);
-    IOOption DelEvent(IOOption op, uint32_t fd);
-    IOOption WaitEvent();
-
-private:
+    IOOption AddEvents(IOOption op, uint32_t fd, SessionInterface *session);
+    IOOption DelEvents(IOOption op, uint32_t fd);
+    int32_t WaitEvents();
+  private:
     int epfd;
     struct epoll_event *events;
     uint32_t maxevents;

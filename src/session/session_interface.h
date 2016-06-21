@@ -18,7 +18,7 @@ enum IOStatus {    //当前session的IO状态
 
 class SessionInterface {
 public:
-    virtual ~SessionInterface(){}
+    virtual ~SessionInterface() {}
 
     virtual int32_t GetFd() = 0;
     virtual int32_t Init() = 0;

@@ -13,7 +13,7 @@
 
 class ConnectSession : public SessionInterface {
 public:
-    ConnectSession(int fd, const std::string &peer_ipv4, uint32_t peer_port)
+    ConnectSession(int fd, const std::string &peer_ipv4, uint16_t peer_port)
         : fd_(fd), peer_ipv4_(peer_ipv4), peer_port_(peer_port) {}
     ~ConnectSession() {}
 
