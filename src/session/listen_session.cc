@@ -5,16 +5,21 @@
  *      Author: joe
  */
 
-#include "session/listen_session.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "connect_session.h"
+
+#include "src/session/listen_session.h"
+#include "src/session/connect_session.h"
 
 int32_t ListenSession::Init() {
     fd_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
     if (fd_ < 0) {
         return -1;
+    }
+    int32_t reuse = 1;
+    if  (setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)) < 0) {
+        return -4;
     }
     struct sockaddr_in listen_addr;
     listen_addr.sin_family = AF_INET;

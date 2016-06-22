@@ -5,9 +5,9 @@
  *      Author: joe
  */
 
-#include "tcp_server/tcp_server.h"
-#include "io_server/epoll_io_server.h"
-#include "session/listen_session.h"
+#include "src/tcp_server/tcp_server.h"
+#include "src/io_server/epoll_io_server.h"
+#include "src/session/listen_session.h"
 
 TCPServer::TCPServer() : io_server_(new EpollIOServer()) {
 }

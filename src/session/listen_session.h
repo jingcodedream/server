@@ -8,8 +8,8 @@
 #ifndef SRC_CORE_SESSION_LISTEN_SESSION_H_
 #define SRC_CORE_SESSION_LISTEN_SESSION_H_
 
-#include "session/session_interface.h"
-#include "io_server/io_server_interface.h"
+#include "src/session/session_interface.h"
+#include "src/io_server/io_server_interface.h"
 
 #include <string>
 

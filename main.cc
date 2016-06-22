@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include <tcp_server/tcp_server.h>
+#include <src/tcp_server/tcp_server.h>
 
 int main() {
     TCPServer tcp_server = TCPServer();

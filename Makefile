@@ -4,10 +4,10 @@ INCLUDE=-I./
 FLAGS=-std=c++11 -g
 
 #中间.o文件生成的目录
-OBJDIR=obj
+OBJDIR=build
 
 #得到所有以后缀.cc结尾的文件
-SRCS=${wildcard */*.cc */*.h *.cc}
+SRCS=${wildcard src/*/*.cc src/*/*.h *.cc}
 #将目录去掉
 NOTDIRSRCS=${notdir ${SRCS}}
 #得到需要的.o文件，包括obj目录

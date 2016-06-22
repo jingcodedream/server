@@ -9,7 +9,7 @@
 #define SRC_CORE_SESSION_CONNECT_SESSION_H_
 
 #include <string>
-#include "session/session_interface.h"
+#include "src/session/session_interface.h"
 
 class ConnectSession : public SessionInterface {
 public:
