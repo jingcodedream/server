@@ -10,6 +10,7 @@
 
 #include "src/session/session_interface.h"
 #include "src/io_server/io_server_interface.h"
+#include "logger.h"
 
 #include <string>
 
@@ -23,7 +24,7 @@ public:
 
     int32_t Init();
     IOStatus OnRead();
-    int32_t GetFd() {return fd_;}
+    int32_t GetFd() const {return fd_;}
     IOStatus OnWrite() {return IOStatusError;}
     IOStatus OnError() {return IOStatusError;}
 private:
@@ -32,6 +33,7 @@ private:
     uint32_t listen_port_;
     uint32_t listen_max_connect_;
     std::shared_ptr<IOServerInterface> io_server_;
+    DECL_LOGGER(logger);
 };
 
 #endif /* SRC_CORE_SESSION_LISTEN_SESSION_H_ */

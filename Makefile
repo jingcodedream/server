@@ -1,7 +1,11 @@
 ##include的目录都是以core下面起始，所以-I要包含core目录，否则会找不到
-INCLUDE=-I./
+INCLUDE=-I./ \
+	-I/usr/local/include/log4cplus
 #需要c++11的支持
-FLAGS=-std=c++11 -g
+FLAGS=-std=c++11 -g -D__LOG4CPLUS__
+#需要的第三方酷
+LIBS=/usr/local/lib/liblog4cplus.a \
+	-lpthread
 
 #中间.o文件生成的目录
 OBJDIR=build
@@ -39,7 +43,7 @@ OBJS=${patsubst %.cc, ${OBJDIR}/%.o, ${NOTDIRSRCS}}
 all:server
 
 server:${SRCS}
-	g++ ${SRCS} ${INCLUDE} ${FLAGS} -o $@
+	g++ ${SRCS} ${INCLUDE} ${LIBS} ${FLAGS} -o $@
 
 clean:
 	rm server

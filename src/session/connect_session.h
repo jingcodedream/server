@@ -8,8 +8,10 @@
 #ifndef SRC_CORE_SESSION_CONNECT_SESSION_H_
 #define SRC_CORE_SESSION_CONNECT_SESSION_H_
 
-#include <string>
 #include "src/session/session_interface.h"
+#include "logger.h"
+
+#include <string>
 
 class ConnectSession : public SessionInterface {
 public:
@@ -19,13 +21,14 @@ public:
 
     int32_t Init();
     IOStatus OnRead();
-    int32_t GetFd() {return fd_;}
+    int32_t GetFd() const {return fd_;}
     IOStatus OnWrite() {return IOStatusError;}
     IOStatus OnError() {return IOStatusError;}
 private:
     int32_t fd_;
     std::string peer_ipv4_;
     uint32_t peer_port_;
+    DECL_LOGGER(logger);
 };
 
 

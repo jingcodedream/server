@@ -20,7 +20,7 @@ class SessionInterface {
 public:
     virtual ~SessionInterface() {}
 
-    virtual int32_t GetFd() = 0;
+    virtual int32_t GetFd() const = 0;
     virtual int32_t Init() = 0;
     virtual IOStatus OnRead() = 0;
     virtual IOStatus OnWrite() = 0;

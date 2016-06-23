@@ -9,9 +9,9 @@
 #define SRC_CORE_TCPSERVER_H_
 
 #include "src/io_server/io_server_interface.h"
+#include "logger.h"
 
 #include <stdint.h>
-
 #include <memory>
 
 class TCPServer {
@@ -22,8 +22,9 @@ public:
     int32_t Init();
 private:
     int32_t OnListen();
-    void OnConnect();
+    int32_t OnConnect();
     std::shared_ptr<IOServerInterface> io_server_;
+    DECL_LOGGER(logger);
 };
 
 #endif /* SRC_CORE_CORESERVER_H_ */
