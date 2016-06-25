@@ -19,8 +19,8 @@ class EpollIOServer : public IOServerInterface {
     bool RunOnce();
     void RunForever();
     int32_t Init();
-    IOOption AddEvents(IOOption op, uint32_t fd, SessionInterface *session);
-    IOOption DelEvents(IOOption op, uint32_t fd);
+    IOEvents AddEvents(IOEvents io_events, SessionInterface *session);
+    IOEvents DelEvents(IOEvents io_events, SessionInterface *session);
     int32_t WaitEvents();
   private:
     int epfd_;
@@ -28,6 +28,7 @@ class EpollIOServer : public IOServerInterface {
     int32_t flags_;
     uint32_t maxevents_;
     uint32_t timeout_;
+    IOEvents io_events_;
     DECL_LOGGER(logger);
 };
 

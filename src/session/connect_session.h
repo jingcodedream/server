@@ -14,20 +14,23 @@
 #include <string>
 
 class ConnectSession : public SessionInterface {
-public:
+  public:
     ConnectSession(int fd, const std::string &peer_ipv4, uint16_t peer_port)
-        : fd_(fd), peer_ipv4_(peer_ipv4), peer_port_(peer_port) {}
+        : fd_(fd), peer_ipv4_(peer_ipv4), peer_port_(peer_port), io_events_(IOEventsEmpty) {}
     ~ConnectSession() {}
 
     int32_t Init();
     IOStatus OnRead();
     int32_t GetFd() const {return fd_;}
+    IOEvents GetIOEvents() const {return io_events_;};
+    void SetIOEvents(IOEvents io_events) {io_events_ = io_events;};
     IOStatus OnWrite() {return IOStatusError;}
     IOStatus OnError() {return IOStatusError;}
-private:
+  private:
     int32_t fd_;
     std::string peer_ipv4_;
     uint32_t peer_port_;
+    IOEvents io_events_;
     DECL_LOGGER(logger);
 };
 

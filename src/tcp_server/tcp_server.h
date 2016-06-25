@@ -15,12 +15,12 @@
 #include <memory>
 
 class TCPServer {
-public:
+  public:
     TCPServer();
     ~TCPServer(){};
-    void RunForever();
     int32_t Init();
-private:
+    void RunForever();
+  private:
     int32_t OnListen();
     int32_t OnConnect();
     std::shared_ptr<IOServerInterface> io_server_;

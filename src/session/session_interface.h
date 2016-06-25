@@ -9,6 +9,7 @@
 #define SRC_CORE_SESSION_INTERFACE_H_
 
 #include <stdint.h>
+#include "src/io_server/epoll_io_server.h"
 
 enum IOStatus {    //当前session的IO状态
     IOStatusSuccess,
@@ -17,10 +18,12 @@ enum IOStatus {    //当前session的IO状态
 };
 
 class SessionInterface {
-public:
+  public:
     virtual ~SessionInterface() {}
 
     virtual int32_t GetFd() const = 0;
+    virtual IOEvents GetIOEvents() const =0;
+    virtual void SetIOEvents(IOEvents io_events) = 0;
     virtual int32_t Init() = 0;
     virtual IOStatus OnRead() = 0;
     virtual IOStatus OnWrite() = 0;

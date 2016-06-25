@@ -20,29 +20,29 @@
 //    IOOptionReadWrite,
 //    IOOPtionError
 //};
-typedef uint32_t IOOption; //io选项
-const IOOption IOOptionEmpty = 0x0000;
-const IOOption IOOptionRead  = 0x0001;
-const IOOption IOOptionWrite = 0x0002;
-const IOOption IOOptionReadWrite  = 0x0003;
-const IOOption IOOPtionError = 0x0004;
+typedef uint32_t IOEvents; //io选项
+const IOEvents IOEventsEmpty = 0x0000;
+const IOEvents IOEventsRead  = 0x0001;
+const IOEvents IOEventsWrite = 0x0002;
+const IOEvents IOEventsReadWrite  = 0x0003;
+const IOEvents IOEventsError = 0x0004;
 
-inline std::string IOOption2String(IOOption io_option) {
+inline std::string IOEvents2String(IOEvents io_events) {
     std::string temp_str;
-    switch (io_option) {
-        case IOOptionEmpty:{
+    switch (io_events) {
+        case IOEventsEmpty:{
             temp_str = "IOOptionEmpty";
             break;
         }
-        case IOOptionRead:{
+        case IOEventsRead:{
             temp_str = "IOOptionRead";
             break;
         }
-        case IOOptionWrite:{
+        case IOEventsWrite:{
             temp_str = "IOOptionWrite";
             break;
         }
-        case IOOptionReadWrite:{
+        case IOEventsReadWrite:{
             temp_str = "IOOptionReadWrite";
             break;
         }
@@ -62,8 +62,8 @@ class IOServerInterface {
     virtual bool RunOnce() = 0;
     virtual void RunForever() = 0;
     virtual int32_t Init() = 0;
-    virtual IOOption AddEvents(IOOption op, uint32_t fd, SessionInterface *session) = 0;
-    virtual IOOption DelEvents(uint32_t events, uint32_t fd) = 0;
+    virtual IOEvents AddEvents(IOEvents io_events, SessionInterface *session) = 0;
+    virtual IOEvents DelEvents(IOEvents io_events, SessionInterface *session) = 0;
     virtual int32_t WaitEvents() = 0;
 };
 

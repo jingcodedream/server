@@ -20,16 +20,14 @@ int32_t TCPServer::OnListen() {
     uint32_t listen_max_connect = 100;
     LOG_DEBUG(logger, "Create Listen Session, ipv4="<<ipv4_1<<", port="<<23333<<", listen_max_connect="<<100);
     SessionInterface *listen_session(new ListenSession("127.0.0.1", 23333, 100, io_server_));
-    LOG_DEBUG(logger, "Init Listen Session");
     int32_t ret = listen_session->Init();
     if (ret != 0) {
         LOG_ERROR(logger, "Init Listen Session Error, ret="<<ret);
         return -1;
     }
-    LOG_DEBUG(logger, "Listen Session Add Events, io_option is "<<IOOption2String(IOOptionRead)<<", fd="<<listen_session->GetFd());
-    IOOption ret_io_option = io_server_->AddEvents(IOOptionRead, listen_session->GetFd(), listen_session);
-    if (ret_io_option == IOOptionEmpty) {
-        LOG_ERROR(logger, "Listen Session Add Events Error, ret_io_option is "<<IOOption2String(ret_io_option));
+    IOEvents ret_io_events = io_server_->AddEvents(IOEventsRead, listen_session);
+    if (ret_io_events == IOEventsEmpty) {
+        LOG_ERROR(logger, "Listen Session Add Events Error, ret_io_option is "<<IOEvents2String(ret_io_events));
         return -2;
     }
     LOG_INFO(logger, "OnListen Success");
@@ -37,10 +35,13 @@ int32_t TCPServer::OnListen() {
 }
 
 int32_t TCPServer::OnConnect() {
+    LOG_INFO(logger, "OnConnect Start");
+    LOG_INFO(logger, "OnConnect Success");
     return 0;
 }
 
 int32_t TCPServer::Init() {
+    LOG_INFO(logger, "TCPServer Init Start");
     int32_t ret = io_server_->Init();
     if (ret != 0) {
         LOG_ERROR(logger, "IO Server Init Error, ret="<<ret);
@@ -56,10 +57,12 @@ int32_t TCPServer::Init() {
         LOG_ERROR(logger, "OnConnect Error, ret="<<ret);
         return -3;
     }
+    LOG_INFO(logger, "TCPServer Init Success");
     return 0;
 }
 
 void TCPServer::RunForever() {
+    LOG_INFO(logger, "TCPServer Run Start");
     io_server_->RunForever();
 }
 
