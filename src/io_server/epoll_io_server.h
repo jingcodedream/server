@@ -11,6 +11,8 @@
 #include "src/io_server/io_server_interface.h"
 #include "logger.h"
 
+std::string IOEvents2String(IOEvents io_events);
+
 class EpollIOServer : public IOServerInterface {
   public:
     EpollIOServer();

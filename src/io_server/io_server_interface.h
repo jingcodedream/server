@@ -27,33 +27,6 @@ const IOEvents IOEventsWrite = 0x0002;
 const IOEvents IOEventsReadWrite  = 0x0003;
 const IOEvents IOEventsError = 0x0004;
 
-inline std::string IOEvents2String(IOEvents io_events) {
-    std::string temp_str;
-    switch (io_events) {
-        case IOEventsEmpty:{
-            temp_str = "IOOptionEmpty";
-            break;
-        }
-        case IOEventsRead:{
-            temp_str = "IOOptionRead";
-            break;
-        }
-        case IOEventsWrite:{
-            temp_str = "IOOptionWrite";
-            break;
-        }
-        case IOEventsReadWrite:{
-            temp_str = "IOOptionReadWrite";
-            break;
-        }
-        default:{
-            temp_str = "IOOPtionError";
-            break;
-        }
-    }
-    return temp_str;
-}
-
 class SessionInterface;
 
 class IOServerInterface {

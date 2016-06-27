@@ -7,6 +7,6 @@
 
 #include "src/packet_handle/internal_packet_handle.h"
 
-IMPL_LOGGER(logger, InternalPacketHandle);
+IMPL_LOGGER(InternalPacketHandle, logger);
 
 

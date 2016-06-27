@@ -17,13 +17,41 @@
 static const uint32_t sc_maxevents=1024;
 static const uint32_t sc_timeout=3000;
 
+std::string IOEvents2String(IOEvents io_events) {
+    std::string temp_str;
+    switch (io_events) {
+        case IOEventsEmpty:{
+            temp_str = "IOOptionEmpty";
+            break;
+        }
+        case IOEventsRead:{
+            temp_str = "IOOptionRead";
+            break;
+        }
+        case IOEventsWrite:{
+            temp_str = "IOOptionWrite";
+            break;
+        }
+        case IOEventsReadWrite:{
+            temp_str = "IOOptionReadWrite";
+            break;
+        }
+        default:{
+            temp_str = "IOOPtionError";
+            break;
+        }
+    }
+    return temp_str;
+}
+
 IMPL_LOGGER(EpollIOServer, logger);
 
 EpollIOServer::EpollIOServer() : EpollIOServer(0, sc_maxevents, sc_timeout) {} //委托构造函数，c++11支持
 
 
 EpollIOServer::EpollIOServer(int32_t flags, uint32_t maxevents, uint32_t timeout)
-    : flags_(flags), maxevents_(maxevents), timeout_(timeout), epfd_(-1), events_(NULL), io_events_(IOEventsEmpty) {}
+    : flags_(flags), maxevents_(maxevents), timeout_(timeout), epfd_(-1), events_(NULL)
+        , io_events_(IOEventsEmpty) {}
 
 EpollIOServer::~EpollIOServer() {
     close(epfd_);
