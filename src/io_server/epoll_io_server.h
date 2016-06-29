@@ -31,7 +31,7 @@ class EpollIOServer : public IOServerInterface {
     uint32_t maxevents_;
     uint32_t timeout_;
     IOEvents io_events_;
-    DECL_LOGGER(logger);
+    DECL_LOGGER(logger_);
 };
 
 #endif /* SRC_CORE_IO_SERVER_EPOLL_IO_SERVER_H_ */

@@ -31,7 +31,7 @@ class ConnectSession : public SessionInterface {
     std::string peer_ipv4_;
     uint32_t peer_port_;
     IOEvents io_events_;
-    DECL_LOGGER(logger);
+    DECL_LOGGER(logger_);
 };
 
 

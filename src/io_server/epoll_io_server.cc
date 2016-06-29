@@ -44,7 +44,7 @@ std::string IOEvents2String(IOEvents io_events) {
     return temp_str;
 }
 
-IMPL_LOGGER(EpollIOServer, logger);
+IMPL_LOGGER(EpollIOServer, logger__);
 
 EpollIOServer::EpollIOServer() : EpollIOServer(0, sc_maxevents, sc_timeout) {} //委托构造函数，c++11支持
 
@@ -59,25 +59,25 @@ EpollIOServer::~EpollIOServer() {
 }
 
 int32_t EpollIOServer::Init() {
-    LOG_INFO(logger, "EpollIOServer Init Start");
+    LOG_INFO(logger_, "EpollIOServer Init Start");
     if ((epfd_ = epoll_create1(flags_)) < 0) {
-        LOG_ERROR(logger, "Epoll Create Failed, errno="<<errno<<", err_str="<<strerror(errno));
+        LOG_ERROR(logger_, "Epoll Create Failed, errno="<<errno<<", err_str="<<strerror(errno));
         return -1;
     }
     if ((events_ = (epoll_event*)malloc(sizeof(struct epoll_event) * maxevents_)) == NULL) {
-        LOG_ERROR(logger, "Malloc Events Failed, errno="<<errno<<", err_str="<<strerror(errno));
+        LOG_ERROR(logger_, "Malloc Events Failed, errno="<<errno<<", err_str="<<strerror(errno));
         return -2;
     }
-    LOG_DEBUG(logger, "sizeof(events_)="<<sizeof(struct epoll_event) * maxevents_);
+    LOG_DEBUG(logger_, "sizeof(events_)="<<sizeof(struct epoll_event) * maxevents_);
     memset(events_, 0, (sizeof(struct epoll_event) * maxevents_));
-    LOG_INFO(logger, "EpollIOServer Init Success");
+    LOG_INFO(logger_, "EpollIOServer Init Success");
     return 0;
 }
 
 IOEvents EpollIOServer::AddEvents(IOEvents io_events, SessionInterface *session) {
     int32_t fd = session->GetFd();
     IOEvents session_io_events = session->GetIOEvents();
-    LOG_INFO(logger, "AddEvents Start, fd="<<fd<<", op is "<<IOEvents2String(io_events));
+    LOG_INFO(logger_, "AddEvents Start, fd="<<fd<<", op is "<<IOEvents2String(io_events));
     struct epoll_event event;
     memset(&event, 0, sizeof(epoll_event));
     if (io_events & IOEventsRead) {
@@ -87,31 +87,31 @@ IOEvents EpollIOServer::AddEvents(IOEvents io_events, SessionInterface *session)
         event.events |= EPOLLOUT;
     }
     event.data.ptr = session;
-    LOG_DEBUG(logger, "Add Events, fd="<<fd<<", op is "<<IOEvents2String(io_events));
+    LOG_DEBUG(logger_, "Add Events, fd="<<fd<<", op is "<<IOEvents2String(io_events));
     if (session_io_events == IOEventsEmpty) {
         if (epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &event) != 0) {
-            LOG_ERROR(logger, "Mod Events Failed, fd="<<fd<<", op is "<<IOEvents2String(io_events));
+            LOG_ERROR(logger_, "Mod Events Failed, fd="<<fd<<", op is "<<IOEvents2String(io_events));
             return IOEventsEmpty;
         }
     } else {
         if (epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &event) != 0) {
-            LOG_ERROR(logger, "Mod Events Failed, fd="<<fd<<", op is "<<IOEvents2String(io_events));
+            LOG_ERROR(logger_, "Mod Events Failed, fd="<<fd<<", op is "<<IOEvents2String(io_events));
             return IOEventsEmpty;
         }
     }
     session->SetIOEvents(io_events);
-    LOG_INFO(logger, "AddEvents Success");
+    LOG_INFO(logger_, "AddEvents Success");
     return io_events;
 }
 
 IOEvents EpollIOServer::DelEvents(IOEvents io_events, SessionInterface *session) {
     int32_t fd = session->GetFd();
     IOEvents session_io_events = session->GetIOEvents();
-    LOG_INFO(logger, "DelEvents Start, fd="<<fd<<", op is "<<IOEvents2String(io_events));
+    LOG_INFO(logger_, "DelEvents Start, fd="<<fd<<", op is "<<IOEvents2String(io_events));
     IOEvents result_io_events = session_io_events & (~io_events);
     if (result_io_events == IOEventsEmpty) {
         if(epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, NULL) != 0) {
-            LOG_ERROR(logger, "Epoll Delete Events failed, fd="<<fd<<", errno="<<errno<<", err_str="<<strerror(errno));
+            LOG_ERROR(logger_, "Epoll Delete Events failed, fd="<<fd<<", errno="<<errno<<", err_str="<<strerror(errno));
         }
         return IOEventsEmpty;
     } else {
@@ -125,12 +125,12 @@ IOEvents EpollIOServer::DelEvents(IOEvents io_events, SessionInterface *session)
         }
         event.data.ptr = session;
         if(epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &event) != 0) {
-            LOG_ERROR(logger, "Epoll Delete Events failed, fd="<<fd<<", errno="<<errno<<", err_str="<<strerror(errno));
+            LOG_ERROR(logger_, "Epoll Delete Events failed, fd="<<fd<<", errno="<<errno<<", err_str="<<strerror(errno));
             return IOEventsEmpty;
         }
         session->SetIOEvents(result_io_events);
     }
-    LOG_INFO(logger, "DelEvents Success, fd="<<fd<<", op is "<<IOEvents2String(io_events));
+    LOG_INFO(logger_, "DelEvents Success, fd="<<fd<<", op is "<<IOEvents2String(io_events));
     return !IOEventsEmpty;
 }
 
@@ -147,19 +147,19 @@ void EpollIOServer::RunForever() {
 }
 
 bool EpollIOServer::RunOnce() {
-    LOG_INFO(logger, "RunOnce");
+    LOG_INFO(logger_, "RunOnce");
     int32_t ret = WaitEvents();
     if (ret < 0) {
-        LOG_ERROR(logger, "Wait Events Has Occured Error, errno="<<errno<<", err_str="<<strerror(errno));
+        LOG_ERROR(logger_, "Wait Events Has Occured Error, errno="<<errno<<", err_str="<<strerror(errno));
         return false;
     }
     for (uint32_t i = 0; i < ret; ++i) {
         SessionInterface *session = static_cast<SessionInterface*>(events_[i].data.ptr);
         int32_t fd = session->GetFd();
-        LOG_DEBUG(logger, "fd Has Prepared, fd="<<fd);
+        LOG_DEBUG(logger_, "fd Has Prepared, fd="<<fd);
         uint32_t del_events = 0;
         if ((events_[i].events & EPOLLIN) == 1) {
-            LOG_DEBUG(logger, "Read Prepared");
+            LOG_DEBUG(logger_, "Read Prepared");
             IOStatus io_status = session->OnRead();
             if (io_status == IOStatusSuccess) {
                 del_events |= IOEventsRead;
@@ -168,7 +168,7 @@ bool EpollIOServer::RunOnce() {
             }
         }
         if ((events_[i].events & EPOLLOUT) == 1) {
-            LOG_DEBUG(logger, "Write Prepared");
+            LOG_DEBUG(logger_, "Write Prepared");
             IOStatus io_status = session->OnWrite();
             if (io_status == IOStatusSuccess) {
                 del_events |= IOEventsWrite;

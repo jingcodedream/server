@@ -36,7 +36,7 @@ class ListenSession : public SessionInterface {
     uint32_t listen_max_connect_;
     std::shared_ptr<IOServerInterface> io_server_;
     IOEvents io_events_;
-    DECL_LOGGER(logger);
+    DECL_LOGGER(logger_);
 };
 
 #endif /* SRC_CORE_SESSION_LISTEN_SESSION_H_ */

@@ -8,20 +8,23 @@
 #ifndef SRC_TIMER_TIMER_INTERFACE_H_
 #define SRC_TIMER_TIMER_INTERFACE_H_
 
+#include <vector>
+
 class TimerInterface {
   public:
     struct TimerNode {
         TimerNode *next_ : 0;
         TimerNode *pre_ : 0;
-        uint64_t ms_ : 0;
+        uint64_t self_ms_ : 0;
         void * user_date_ : 0;
     };
     virtual ~TimerInterface() {};
-    virtual void Init() = 0;
+    virtual int32_t Init() = 0;
     virtual void Start() = 0;
-    virtual void Add(const TimerNode &timer_node) = 0;
-    virtual void Del() = 0;
-    virtual void CheckTimeout() = 0;
+    virtual int32_t Add(TimerNode *timer_node) = 0;
+    virtual void Del(TimerNode *timer_node) = 0;
+    virtual int32_t CheckTimeout(uint64_t now_ms, std::vector<TimerNode*> &timer_node_vec) = 0;
+    virtual int32_t CheckTimeOut(std::vector<TimerNode*> &timer_node_vec) = 0;
 };
 
 

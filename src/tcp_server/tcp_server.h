@@ -24,7 +24,7 @@ class TCPServer {
     int32_t OnListen();
     int32_t OnConnect();
     std::shared_ptr<IOServerInterface> io_server_;
-    DECL_LOGGER(logger);
+    DECL_LOGGER(logger_);
 };
 
 #endif /* SRC_CORE_CORESERVER_H_ */

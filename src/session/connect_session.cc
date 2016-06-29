@@ -10,7 +10,7 @@
 
 #include "src/session/connect_session.h"
 
-IMPL_LOGGER(ConnectSession, logger);
+IMPL_LOGGER(ConnectSession, logger_);
 
 int32_t ConnectSession::Init() {
     return 0;

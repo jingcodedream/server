@@ -15,16 +15,26 @@ class TimeWheelTimer : public TimerInterface {
   public:
     TimeWheelTimer();
     ~TimeWheelTimer();
-    void Init();
+    int32_t Init();
     void Start();
-    void Add(const TimerNode &timer_node);
-    void Del();
-    void CheckTimeout();
+    int32_t Add(TimerNode *timer_node);
+    void Del(TimerNode *timer_node);
+    int32_t CheckTimeout(uint64_t now_ms, std::vector<TimerNode*> &timer_node_vec);
+    int32_t CheckTimeout(std::vector<TimerNode*> &timer_node_vec);
   private:
-    static const uint32_t WHEEL_NUM_ = 4;
-    static const uint32_t WHEEL_NODE_NUM_ = 64;
+    uint64_t now_ms_;
+    const static uint32_t WHEEL_NUM_ = 4;
+    const static uint32_t WHEEL_NODE_NUM_ = 64;
+    const static uint32_t index_type_hour_ = 3;
+    const static uint32_t index_type_min_ = 2;
+    const static uint32_t index_type_sec_ = 1;
+    const static uint32_t index_type_ms_ = 0;
     TimerNode timer_nodes_[WHEEL_NUM_][WHEEL_NODE_NUM_];
-    DECL_LOGGER(logger);
+    uint32_t ms_index_;
+    uint32_t sec_index_;
+    uint32_t min_index_;
+    uint32_t hour_index_;
+    DECL_LOGGER(logger_);
 };
 
 
