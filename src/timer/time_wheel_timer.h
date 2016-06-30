@@ -14,9 +14,8 @@
 class TimeWheelTimer : public TimerInterface {
   public:
     TimeWheelTimer();
-    ~TimeWheelTimer();
+    ~TimeWheelTimer() {};
     int32_t Init();
-    void Start();
     int32_t Add(TimerNode *timer_node);
     void Del(TimerNode *timer_node);
     int32_t CheckTimeout(uint64_t now_ms, std::vector<TimerNode*> &timer_node_vec);

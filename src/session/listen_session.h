@@ -10,6 +10,7 @@
 
 #include "src/session/session_interface.h"
 #include "src/io_server/io_server_interface.h"
+#include "src/timer/timer_interface.h"
 #include "logger.h"
 
 #include <string>
@@ -17,9 +18,9 @@
 class ListenSession : public SessionInterface {
   public:
     ListenSession(const std::string &listen_ipv4, uint16_t listen_port,
-            uint32_t listen_max_connect, std::shared_ptr<IOServerInterface> io_server_)
+            uint32_t listen_max_connect, std::shared_ptr<IOServerInterface> io_server_, std::shared_ptr<TimerInterface> timer)
         : fd_(-1), listen_ipv4_(listen_ipv4), listen_port_(listen_port), listen_max_connect_(listen_max_connect),
-            io_server_(io_server_), io_events_(IOEventsEmpty) {}
+            io_server_(io_server_), io_events_(IOEventsEmpty), timer_(timer) {}
     ~ListenSession() {}
 
     int32_t Init();
@@ -35,6 +36,7 @@ class ListenSession : public SessionInterface {
     uint32_t listen_port_;
     uint32_t listen_max_connect_;
     std::shared_ptr<IOServerInterface> io_server_;
+    std::shared_ptr<TimerInterface> timer_;
     IOEvents io_events_;
     DECL_LOGGER(logger_);
 };

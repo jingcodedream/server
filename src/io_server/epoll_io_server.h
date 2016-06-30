@@ -9,14 +9,15 @@
 #define SRC_CORE_IO_SERVER_EPOLL_IO_SERVER_H_
 
 #include "src/io_server/io_server_interface.h"
+#include "src/timer/timer_interface.h"
 #include "logger.h"
 
 std::string IOEvents2String(IOEvents io_events);
 
 class EpollIOServer : public IOServerInterface {
   public:
-    EpollIOServer();
-    EpollIOServer(int32_t flags, uint32_t maxevents, uint32_t timeout);
+    EpollIOServer(std::shared_ptr<TimerInterface> timer);
+    EpollIOServer(int32_t flags, uint32_t maxevents, uint32_t timeout, std::shared_ptr<TimerInterface> timer);
     ~EpollIOServer();
     bool RunOnce();
     void RunForever();
@@ -31,6 +32,7 @@ class EpollIOServer : public IOServerInterface {
     uint32_t maxevents_;
     uint32_t timeout_;
     IOEvents io_events_;
+    std::shared_ptr<TimerInterface> timer_;
     DECL_LOGGER(logger_);
 };
 

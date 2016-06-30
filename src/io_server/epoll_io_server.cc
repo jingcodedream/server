@@ -7,12 +7,15 @@
 
 #include "src/io_server/epoll_io_server.h"
 #include "src/session/session_interface.h"
+#include "src/timer/timer_interface.h"
 
 #include <sys/epoll.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+
+#include <vector>
 
 static const uint32_t sc_maxevents=1024;
 static const uint32_t sc_timeout=3000;
@@ -44,14 +47,14 @@ std::string IOEvents2String(IOEvents io_events) {
     return temp_str;
 }
 
-IMPL_LOGGER(EpollIOServer, logger__);
+IMPL_LOGGER(EpollIOServer, logger_);
 
-EpollIOServer::EpollIOServer() : EpollIOServer(0, sc_maxevents, sc_timeout) {} //委托构造函数，c++11支持
+EpollIOServer::EpollIOServer(std::shared_ptr<TimerInterface> timer) : EpollIOServer(0, sc_maxevents, sc_timeout, timer) {} //委托构造函数，c++11支持
 
 
-EpollIOServer::EpollIOServer(int32_t flags, uint32_t maxevents, uint32_t timeout)
+EpollIOServer::EpollIOServer(int32_t flags, uint32_t maxevents, uint32_t timeout, std::shared_ptr<TimerInterface> timer)
     : flags_(flags), maxevents_(maxevents), timeout_(timeout), epfd_(-1), events_(NULL)
-        , io_events_(IOEventsEmpty) {}
+        , io_events_(IOEventsEmpty), timer_(timer) {}
 
 EpollIOServer::~EpollIOServer() {
     close(epfd_);
@@ -148,6 +151,24 @@ void EpollIOServer::RunForever() {
 
 bool EpollIOServer::RunOnce() {
     LOG_INFO(logger_, "RunOnce");
+    //检查超时session
+    std::vector<TimerInterface::TimerNode*> timer_node_vec;
+    if (timer_->CheckTimeout(timer_node_vec) != 0) {
+        LOG_ERROR(logger_, "Timer Check Timeout Error");
+        return false;
+    }
+
+    for (std::vector<TimerInterface::TimerNode*>::iterator it = timer_node_vec.begin(); it != timer_node_vec.end(); ++it) {
+//        SessionInterface *session = static_cast<SessionInterface*>((*it)->user_date_);
+//        if (session != NULL) {
+//            int32_t fd = session->GetFd();
+//            delete session;
+//            close(fd);
+//            LOG_DEBUG(logger_, "close fd because timeout, fd="<<fd);
+//        }
+        timer_->Del(*it);
+    }
+
     int32_t ret = WaitEvents();
     if (ret < 0) {
         LOG_ERROR(logger_, "Wait Events Has Occured Error, errno="<<errno<<", err_str="<<strerror(errno));
@@ -180,6 +201,7 @@ bool EpollIOServer::RunOnce() {
             if(DelEvents(del_events, session) == IOEventsEmpty) {
                 delete session;
                 close(fd);
+                LOG_DEBUG(logger_, "close fd io delete, fd="<<fd);
             }
         }
     }

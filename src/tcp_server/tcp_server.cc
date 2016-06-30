@@ -8,10 +8,11 @@
 #include "src/tcp_server/tcp_server.h"
 #include "src/io_server/epoll_io_server.h"
 #include "src/session/listen_session.h"
+#include "src/timer/time_wheel_timer.h"
 
 IMPL_LOGGER(TCPServer, logger_);
 
-TCPServer::TCPServer() : io_server_(new EpollIOServer()) {}
+TCPServer::TCPServer() : timer_(new TimeWheelTimer()), io_server_(new EpollIOServer(timer_)) {}
 
 int32_t TCPServer::OnListen() {
     LOG_INFO(logger_, "OnListen Start");
@@ -19,7 +20,7 @@ int32_t TCPServer::OnListen() {
     uint16_t port_1 = 23333;
     uint32_t listen_max_connect = 100;
     LOG_DEBUG(logger_, "Create Listen Session, ipv4="<<ipv4_1<<", port="<<23333<<", listen_max_connect="<<100);
-    SessionInterface *listen_session(new ListenSession("127.0.0.1", 23333, 100, io_server_));
+    SessionInterface *listen_session(new ListenSession("127.0.0.1", 23333, 100, io_server_, timer_));
     int32_t ret = listen_session->Init();
     if (ret != 0) {
         LOG_ERROR(logger_, "Init Listen Session Error, ret="<<ret);
@@ -46,6 +47,11 @@ int32_t TCPServer::Init() {
     if (ret != 0) {
         LOG_ERROR(logger_, "IO Server Init Error, ret="<<ret);
         return -1;
+    }
+    ret = timer_->Init();
+    if (ret != 0) {
+        LOG_ERROR(logger_, "Timer Init Error, ret="<<ret);
+        return -3;
     }
     ret = OnListen();
     if (ret != 0) {

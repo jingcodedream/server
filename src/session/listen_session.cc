@@ -5,14 +5,15 @@
  *      Author: joe
  */
 
+#include "src/session/listen_session.h"
+#include "src/session/connect_session.h"
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <string.h>
-
-#include "src/session/listen_session.h"
-#include "src/session/connect_session.h"
+#include <sys/time.h>
 
 IMPL_LOGGER(ListenSession, logger_);
 
@@ -55,7 +56,23 @@ IOStatus ListenSession::OnRead() {
     }
     LOG_DEBUG(logger_, "accept_fd="<<accept_fd);
     SessionInterface *accept_session(new ConnectSession(accept_fd, inet_ntoa(peer_addr.sin_addr), peer_addr.sin_port));
-    io_server_->AddEvents(IOEventsRead, accept_session);
+    if ((io_server_->AddEvents(IOEventsRead, accept_session) == IOEventsEmpty)) {
+        LOG_ERROR(logger_, "Add Connect Events Error, fd="<<fd_<<", ret="<<IOEventsEmpty);
+        return IOStatusError;
+    }
+    TimerInterface::TimerNode *temp_timer_node = new TimerInterface::TimerNode();
+    struct timeval tv;
+    if (gettimeofday(&tv, NULL) != 0) {
+        LOG_ERROR(logger_, "gettimeofday return error, errno="<<errno<<", err_str="<<strerror(errno));
+        return IOStatusError;
+    }
+    uint64_t time_out_ms = 1000;
+    temp_timer_node->self_ms_ = tv.tv_sec*1000 + tv.tv_usec/1000 + time_out_ms;
+    temp_timer_node->user_date_ = accept_session;
+    if ((timer_->Add(temp_timer_node)) != 0) {
+        LOG_ERROR(logger_, "Add Timer Node Error");
+        return IOStatusError;
+    }
     LOG_INFO(logger_, "Listen Session OnRead Finished");
     return IOStatusContinue;
 }
