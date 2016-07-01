@@ -71,6 +71,7 @@ IOStatus ListenSession::OnRead() {
     temp_timer_node->user_date_ = accept_session;
     if ((timer_->Add(temp_timer_node)) != 0) {
         LOG_ERROR(logger_, "Add Timer Node Error");
+        delete temp_timer_node;
         return IOStatusError;
     }
     LOG_INFO(logger_, "Listen Session OnRead Finished");

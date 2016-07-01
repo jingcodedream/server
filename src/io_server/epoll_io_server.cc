@@ -157,16 +157,16 @@ bool EpollIOServer::RunOnce() {
         LOG_ERROR(logger_, "Timer Check Timeout Error");
         return false;
     }
-
+    LOG_INFO(logger_, "timer_node_vec size="<<timer_node_vec.size());
     for (std::vector<TimerInterface::TimerNode*>::iterator it = timer_node_vec.begin(); it != timer_node_vec.end(); ++it) {
-//        SessionInterface *session = static_cast<SessionInterface*>((*it)->user_date_);
-//        if (session != NULL) {
-//            int32_t fd = session->GetFd();
-//            delete session;
-//            close(fd);
-//            LOG_DEBUG(logger_, "close fd because timeout, fd="<<fd);
-//        }
-        timer_->Del(*it);
+        SessionInterface *session = static_cast<SessionInterface*>((*it)->user_date_);
+        if (session != NULL) {
+            int32_t fd = session->GetFd();
+            delete session;
+            close(fd);
+            LOG_DEBUG(logger_, "close fd because timeout, fd="<<fd);
+        }
+        delete *it;
     }
 
     int32_t ret = WaitEvents();
@@ -199,7 +199,7 @@ bool EpollIOServer::RunOnce() {
         }
         if(del_events != IOEventsEmpty) {
             if(DelEvents(del_events, session) == IOEventsEmpty) {
-                delete session;
+                //delete session;
                 close(fd);
                 LOG_DEBUG(logger_, "close fd io delete, fd="<<fd);
             }

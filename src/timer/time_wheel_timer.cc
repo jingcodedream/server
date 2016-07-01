@@ -75,11 +75,12 @@ int32_t TimeWheelTimer::Add(TimerNode *timer_node) {
 }
 
 void TimeWheelTimer::Del(TimerNode *timer_node) {
+    LOG_INFO(logger_, "Del Timer Node Start");
     timer_node->pre_->next_ = timer_node->next_;
     if (timer_node->next_ != NULL) {
         timer_node->next_->pre_ = timer_node->pre_;
     }
-    delete timer_node;
+    LOG_INFO(logger_, "Del Timer Node finished");
 }
 
 int32_t TimeWheelTimer::CheckTimeout(std::vector<TimerNode*> &timer_node_vec) {
@@ -101,8 +102,10 @@ int32_t TimeWheelTimer::CheckTimeout(uint64_t now_ms, std::vector<TimerNode*> &t
     for (uint32_t i = 0; i < interval_ms_count; ++i) {
         TimerNode *temp_timer_node = timer_nodes_[index_type_ms_][ms_index_].next_;
         while (temp_timer_node != NULL) {
+            TimerNode *temp_timer_node_next = temp_timer_node->next_;
             timer_node_vec.push_back(temp_timer_node);
-            temp_timer_node = temp_timer_node->next_;
+            Del(temp_timer_node);
+            temp_timer_node = temp_timer_node_next;
         }
         now_ms_ += 16;
         TimerNode *temp_temp_timer_node = nullptr;
@@ -117,21 +120,30 @@ int32_t TimeWheelTimer::CheckTimeout(uint64_t now_ms, std::vector<TimerNode*> &t
                     temp_temp_timer_node = timer_nodes_[index_type_hour_][hour_index_].next_;
                     while (temp_temp_timer_node != NULL) {
                         temp_temp_timer_node_next = temp_temp_timer_node->next_;
-                        Add(temp_temp_timer_node);
+                        Del(temp_temp_timer_node);
+                        if ((Add(temp_temp_timer_node)) != 0) {
+                           delete  temp_temp_timer_node;
+                        }
                         temp_temp_timer_node = temp_temp_timer_node_next;
                     }
                 }
                 temp_temp_timer_node = timer_nodes_[index_type_min_][min_index_].next_;
                 while (temp_temp_timer_node != NULL) {
                     temp_temp_timer_node_next = temp_temp_timer_node->next_;
-                    Add(temp_temp_timer_node);
+                    Del(temp_temp_timer_node);
+                    if ((Add(temp_temp_timer_node)) != 0) {
+                       delete  temp_temp_timer_node;
+                    }
                     temp_temp_timer_node = temp_temp_timer_node_next;
                 }
             }
             temp_temp_timer_node = timer_nodes_[index_type_sec_][sec_index_].next_;
             while (temp_temp_timer_node != NULL) {
                 temp_temp_timer_node_next = temp_temp_timer_node->next_;
-                Add(temp_temp_timer_node);
+                Del(temp_temp_timer_node);
+                if ((Add(temp_temp_timer_node)) != 0) {
+                   delete  temp_temp_timer_node;
+                }
                 temp_temp_timer_node = temp_temp_timer_node_next;
             }
         }
