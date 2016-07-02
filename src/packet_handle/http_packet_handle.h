@@ -14,7 +14,9 @@ class HttpPacketHandle : public PacketHandleInterface {
   public:
     HttpPacketHandle() {}
     ~HttpPacketHandle() {}
-    IOStatus ParsePacket(std::string req_str);
+    IOStatus ParsePacket(const std::string &req_str);
+  private:
+    DECL_LOGGER(logger_);
 };
 
 
