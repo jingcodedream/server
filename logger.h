@@ -7,6 +7,7 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
+
 #ifdef __LOG4CPLUS__
 #include <log4cplus/logger.h>
 #include <log4cplus/fileappender.h>

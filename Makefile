@@ -11,7 +11,7 @@ LIBS=/usr/local/lib/liblog4cplus.a \
 OBJDIR=build
 
 #得到所有以后缀.cc结尾的文件
-SRCS=${wildcard src/*/*.cc src/*/*.h *.cc}
+SRCS=${wildcard src/*/*.cc *.cc}
 #将目录去掉
 NOTDIRSRCS=${notdir ${SRCS}}
 #得到需要的.o文件，包括obj目录
@@ -24,11 +24,6 @@ OBJS=${patsubst %.cc, ${OBJDIR}/%.o, ${NOTDIRSRCS}}
 
 #all:${OBJS} lib
 
-#生成所有.o文件
-#${OBJDIR}/%.o:*/%.cc
-	#检查是否存在obj目录，没有就创建
-#	if [ ! -d ${OBJDIR} ] ; then mkdir obj; fi
-#	g++ -fPIC ${INCLUDE} $< ${FLAGS} -c -o $@
 
 #lib:
 	#打包成静态库
@@ -42,8 +37,18 @@ OBJS=${patsubst %.cc, ${OBJDIR}/%.o, ${NOTDIRSRCS}}
 
 all:server
 
-server:${SRCS}
-	g++ ${SRCS} ${INCLUDE} ${LIBS} ${FLAGS} -o $@
+server:${OBJS}
+	g++ ${OBJS} ${INCLUDE} ${LIBS} ${FLAGS} -o $@
+
+#生成所有.o文件
+${OBJDIR}/%.o:src/*/%.cc
+	#检查是否存在obj目录，没有就创建
+	if [ ! -d ${OBJDIR} ] ; then mkdir ${OBJDIR}; fi
+	g++ -fPIC ${INCLUDE} $< ${FLAGS} -c -o $@
+
+${OBJDIR}/%.o:%.cc
+	if [ ! -d ${OBJDIR} ] ; then mkdir ${OBJDIR}; fi
+	g++ -fPIC ${INCLUDE} $< ${FLAGS} -c -o $@
 
 clean:
-	rm server
+	rm server ${OBJDIR}/*
